@@ -18,7 +18,6 @@ use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\math\Vector3;
 use function count;
-use function intval;
 
 class Navigator {
     protected Entity $entity;
@@ -99,14 +98,6 @@ class Navigator {
         return $this->targetEntity;
     }
 
-    public function setTargetEntity(?Entity $targetEntity): void{
-        $this->targetEntity = $targetEntity;
-    }
-
-    public function getTargetVector3(): ?Vector3{
-        return $this->targetVector3;
-    }
-
     public function setTargetVector3(?Vector3 $targetVector3): void{
         $this->targetVector3 = $targetVector3;
         $this->recalculatePath();
@@ -121,21 +112,6 @@ class Navigator {
     }
 
     public function onUpdate(): void {
-        if($this->targetEntity !== null) {
-            //TODO: Move this to behaviors
-            if(
-                $this->targetEntity->isClosed() ||
-                !$this->targetEntity->isAlive()
-            ) $this->setTargetEntity(null);
-
-            if($this->targetEntity !== null) {
-                $position = $this->targetEntity->getPosition();
-                if(!$position->world->isInWorld(intval($position->x), intval($position->y), intval($position->z))) return;
-                if($this->targetVector3 === null || $this->targetVector3->distanceSquared($position) > 1) {
-                    $this->setTargetVector3($position);
-                }
-            }
-        }
         if($this->targetVector3 === null) return;
 
         $location = $this->entity->getLocation();
