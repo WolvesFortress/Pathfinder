@@ -86,6 +86,10 @@ class Navigator {
         return $this->jumpTicks;
     }
 
+    public function getAlgorithm(): ?Algorithm{
+        return $this->algorithm;
+    }
+
     public function resetJumpTicks(int $ticks = 4): void {
         $this->jumpTicks = $ticks;
     }
