@@ -20,8 +20,6 @@ use pocketmine\math\Vector3;
 use function count;
 
 class Navigator {
-    protected Entity $entity;
-
     protected float $speed = 0.3;
 
     protected ?Vector3 $targetVector3 = null;
@@ -44,8 +42,7 @@ class Navigator {
 
     protected ?Algorithm $algorithm = null;
 
-    public function __construct(Living $entity, ?MovementHandler $movementHandler = null, ?CostCalculator $costCalculator = null){
-        $this->entity = $entity;
+    public function __construct(protected Living $entity, ?MovementHandler $movementHandler = null, ?CostCalculator $costCalculator = null){
         $this->movementHandler = $movementHandler ?? new DefaultMovementHandler();
         $this->costCalculator = $costCalculator ?? new DefaultCostCalculator();
     }
