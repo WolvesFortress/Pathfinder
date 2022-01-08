@@ -121,7 +121,7 @@ class Navigator {
                 $this->algorithm = (new AStar($this->entity->getWorld(), $location->floor(), $this->targetVector3, $this->entity->getBoundingBox()))
                     ->setBlockValidators($this->blockValidators)
                     ->setTimeout(0.0005)
-                    ->setMaxTicks(200)
+                    ->setMaxTicks(0)
                     ->then(function(?PathResult $pathResult): void {
                         $this->pathResult = $pathResult;
                         if($pathResult === null) return;
