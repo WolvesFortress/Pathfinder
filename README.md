@@ -28,7 +28,7 @@ $settings = \matze\pathfinder\setting\Settings::get()
 
 // Initialize pathfinder
 $pathfinder = new \matze\pathfinder\Pathfinder([
-    new \matze\pathfinder\rule\default\ChickenRule(\matze\pathfinder\rule\Rule::PRIORITY_NORMAL),//Define rules and set priorities
+    new \matze\pathfinder\rule\default\EntitySizeRule(new \pocketmine\entity\EntitySizeInfo(2, 1), \matze\pathfinder\rule\Rule::PRIORITY_NORMAL),//Define rules and set priorities
 ], $settings);
 
 // Find path synchron
