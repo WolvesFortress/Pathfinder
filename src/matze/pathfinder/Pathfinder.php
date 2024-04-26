@@ -100,6 +100,9 @@ class Pathfinder {
             $chunk = $world->getChunk($x, $y);
             if($chunk !== null) {
                 $chunks[World::chunkHash($x, $y)] = FastChunkSerializer::serializeTerrain($chunk);
+                if(count($chunks) > $chunkCacheLimit) {
+                    break;
+                }
             }
         }
         Server::getInstance()->getAsyncPool()->submitTask(new AsyncPathfinderTask(World::blockHash($from->getFloorX(), $from->getFloorY(), $from->getFloorZ()), World::blockHash($to->getFloorX(), $to->getFloorY(), $to->getFloorZ()), $world->getFolderName(), $timeout, igbinary_serialize($this->settings), ThreadSafeArray::fromArray(array_map(function(Rule $rule): string {
