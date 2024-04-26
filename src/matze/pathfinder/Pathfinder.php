@@ -21,6 +21,7 @@ use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use pocketmine\world\format\io\FastChunkSerializer;
 use pocketmine\world\World;
+use pocketmine\utils\Utils as PMUtils;
 
 class Pathfinder {
     private static bool $debug = false;
@@ -89,7 +90,8 @@ class Pathfinder {
         return $pathfinder->findPath($from, $to);
     }
 
-    public function findPathAsync(Vector3 $from, Vector3 $to, World $world, Closure $closure, float $timeout = 0.2, int $chunkCacheLimit = 64): void {
+    public function findPathAsync(Vector3 $from, Vector3 $to, World $world, Closure $onCompletion, float $timeout = 0.2, int $chunkCacheLimit = 64): void {
+        PMUtils::validateCallableSignature(function (?PathResult $result): void {}, $onCompletion);
         $this->running = true;
         $chunks = [];
         foreach(Utils::getChunksBetween($from, $to) as $vector2) {
@@ -102,9 +104,9 @@ class Pathfinder {
         }
         Server::getInstance()->getAsyncPool()->submitTask(new AsyncPathfinderTask(World::blockHash($from->getFloorX(), $from->getFloorY(), $from->getFloorZ()), World::blockHash($to->getFloorX(), $to->getFloorY(), $to->getFloorZ()), $world->getFolderName(), $timeout, igbinary_serialize($this->settings), ThreadSafeArray::fromArray(array_map(function(Rule $rule): string {
             return igbinary_serialize($rule);
-        }, $this->rules)), $chunkCacheLimit, ThreadSafeArray::fromArray($chunks), function(?PathResult $result) use ($closure): void {
+        }, $this->rules)), $chunkCacheLimit, ThreadSafeArray::fromArray($chunks), function(?PathResult $result) use ($onCompletion): void {
             $this->running = false;
-            ($closure)($result);
+            ($onCompletion)($result);
         }));
     }
 
