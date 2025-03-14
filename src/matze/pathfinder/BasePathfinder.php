@@ -210,7 +210,7 @@ class BasePathfinder {
 		// This basically says "prefer nodes that are along the direct path"
 		$alignmentWeight = abs(($maxDistance - $nodeDistanceToTarget) ** 2); // Adjust as needed
 
-		return $distanceToTarget ** 2 * 0.7 - ($alignment * $alignmentWeight);
+		return $distanceToTarget ** 2 * 0.8 - ($alignment * $alignmentWeight);
 	}
 
     protected function isClearBetweenPoints(Vector3 $vec1, Vector3 $vec2): bool {
