@@ -108,8 +108,8 @@ class BasePathfinder {
                 }
                 if(!isset($this->openList[$node->getHash()]) || ($currentNode->getG() + $cost) < $node->getG()) {
                     $node->setG(($currentNode->getG() + $cost));
-                    $node->setH($node->distance($targetVector));
-                    $node->setParentNode($currentNode);
+					$node->setH($this->calculateSimpleHeuristic($node, $targetVector));
+					$node->setParentNode($currentNode);
                     $this->openList[$node->getHash()] = $node;
                     if($bestNode === null || $bestNode->getH() > $node->getH()) {
                         $bestNode = $node;
@@ -172,6 +172,20 @@ class BasePathfinder {
         asort($openList);
         return array_key_first($openList);
     }
+
+	protected function calculateSimpleHeuristic(Node $node, Vector3 $targetVector) : float{
+		// Manhattan distance is often better for grid-based movement
+		$dx = abs($node->x - $targetVector->x);
+		$dy = abs($node->y - $targetVector->y);
+		$dz = abs($node->z - $targetVector->z);
+
+		// Combine Manhattan distance with a small Euclidean component
+		// This will encourage more direct paths without risking pathfinding errors
+		$manhattan = $dx + $dy + $dz;
+		$euclidean = sqrt($dx * $dx + $dy * $dy + $dz * $dz);
+
+		return $manhattan * 0.8 + $euclidean * 0.2;
+	}
 
     protected function isClearBetweenPoints(Vector3 $vec1, Vector3 $vec2): bool {
         if(!$this->settings->isPathSmoothing() || $vec1->getFloorY() !== $vec2->getFloorY()) {
