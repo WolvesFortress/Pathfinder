@@ -32,7 +32,8 @@ class PathfinderCommand extends Command {
         $this->setPermission("command.pathfinder.use");
         $this->pathfinder = new Pathfinder([
             new EntitySizeRule(new EntitySizeInfo(2, 1)),
-        ], Settings::get()->setPathSmoothing(false)->setMaxTravelDistanceDown(2)->setMaxTravelDistanceUp(2));
+			//TODO: Parameter for path smoothing
+		], Settings::get()->setPathSmoothing(true)->setMaxTravelDistanceDown(2)->setMaxTravelDistanceUp(2));
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void{

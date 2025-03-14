@@ -54,6 +54,11 @@ class BasePathfinder {
         if($startVector->floor()->equals($targetVector->floor())) {
             return null;
         }
+		// Calculate direction vector once
+		$directionVector = $targetVector->subtractVector($startVector);
+		// Store raw distance for scaling purposes
+		$totalDistance = $directionVector->length();
+		$directionVector = $directionVector->normalize();
 
         $rules = [];
         foreach($this->rules as $rule) {
@@ -108,7 +113,8 @@ class BasePathfinder {
                 }
                 if(!isset($this->openList[$node->getHash()]) || ($currentNode->getG() + $cost) < $node->getG()) {
                     $node->setG(($currentNode->getG() + $cost));
-					$node->setH($this->calculateSimpleHeuristic($node, $targetVector));
+//					$node->setH($this->calculateSimpleHeuristic($node, $targetVector));
+					$node->setH($this->calculateDirectionalHeuristic($node, $targetVector, $totalDistance, $directionVector));
 					$node->setParentNode($currentNode);
                     $this->openList[$node->getHash()] = $node;
                     if($bestNode === null || $bestNode->getH() > $node->getH()) {
@@ -182,9 +188,29 @@ class BasePathfinder {
 		// Combine Manhattan distance with a small Euclidean component
 		// This will encourage more direct paths without risking pathfinding errors
 		$manhattan = $dx + $dy + $dz;
-		$euclidean = sqrt($dx * $dx + $dy * $dy + $dz * $dz);
+//		$euclidean = sqrt($dx * $dx + $dy * $dy + $dz * $dz);
 
-		return $manhattan * 0.8 + $euclidean * 0.2;
+		return $manhattan/* * 0.8 + $euclidean * 0.2*/ ;
+	}
+
+	protected function calculateDirectionalHeuristic(Node $node, Vector3 $targetVector, float $maxDistance, Vector3 $directionVector) : float{
+		// Basic distance to target
+		$distanceToTarget = $this->calculateSimpleHeuristic($node, $targetVector);
+
+		// Calculate how aligned this node is with the desired direction
+		$nodeToTarget = $targetVector->subtractVector($node);
+		// Calculate the distance to the end point to have less penalty the closer you are, otherwise it might give high penalty for nodes close to the goal since the angle is different
+		$nodeDistanceToTarget = $nodeToTarget->length();
+		$nodeToTargetNorm = $nodeToTarget->normalize();
+
+		// Dot product measures alignment (1 = perfect alignment, 0 = perpendicular, -1 = opposite)
+		$alignment = $nodeToTargetNorm->dot($directionVector);
+
+		// Reward nodes that are well-aligned with the target direction
+		// This basically says "prefer nodes that are along the direct path"
+		$alignmentWeight = abs(($maxDistance - $nodeDistanceToTarget) ** 2); // Adjust as needed
+
+		return $distanceToTarget ** 2 * 0.7 - ($alignment * $alignmentWeight);
 	}
 
     protected function isClearBetweenPoints(Vector3 $vec1, Vector3 $vec2): bool {
