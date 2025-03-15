@@ -33,13 +33,18 @@ class DStarLite{
 	}
 
 	private function h(Node $a, Node $b) : float{
-		// Use octile distance for grid-based environments with diagonal movement
 		$dx = abs($a->getX() - $b->getX());
+		// If your entities can move vertically (e.g., climb blocks, jump, or fly), include dy in the heuristic to account for vertical movement costs.
 		$dy = abs($a->getY() - $b->getY());
 		$dz = abs($a->getZ() - $b->getZ());
+
+		// Octile distance for X and Z axes
 		$minD = min($dx, $dz);
 		$maxD = max($dx, $dz);
-		return ($minD * sqrt(2)) + ($maxD - $minD);
+		$octileDistance = ($minD * sqrt(2)) + ($maxD - $minD);
+
+		// Add vertical distance (Y-axis) as a separate cost
+		return $octileDistance + $dy;
 	}
 
 	private function updateVertex(Node $u, Node $start, Node $goal) : void{
