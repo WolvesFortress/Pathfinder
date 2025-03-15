@@ -33,7 +33,13 @@ class DStarLite{
 	}
 
 	private function h(Node $a, Node $b) : float{
-		return abs($a->getX() - $b->getX()) + abs($a->getY() - $b->getY()) + abs($a->getZ() - $b->getZ());
+		// Use octile distance for grid-based environments with diagonal movement
+		$dx = abs($a->getX() - $b->getX());
+		$dy = abs($a->getY() - $b->getY());
+		$dz = abs($a->getZ() - $b->getZ());
+		$minD = min($dx, $dz);
+		$maxD = max($dx, $dz);
+		return ($minD * sqrt(2)) + ($maxD - $minD);
 	}
 
 	private function updateVertex(Node $u, Node $start, Node $goal) : void{
@@ -88,7 +94,13 @@ class DStarLite{
 	}
 
 	private function cost(Node $a, Node $b) : float{
-		return $this->h($a, $b); // Assuming uniform cost for simplicity
+		// Use octile distance for grid-based environments with diagonal movement
+		$dx = abs($a->getX() - $b->getX());
+		$dy = abs($a->getY() - $b->getY());
+		$dz = abs($a->getZ() - $b->getZ());
+		$minD = min($dx, $dz);
+		$maxD = max($dx, $dz);
+		return ($minD * sqrt(2)) + ($maxD - $minD);
 	}
 
 	private function getNeighbors(Node $node) : array{
@@ -100,6 +112,8 @@ class DStarLite{
 			new Vector3(0, 1, 1), new Vector3(0, 1, -1),  // South Up, North Up
 			new Vector3(1, -1, 0), new Vector3(-1, -1, 0), // East Down, West Down
 			new Vector3(0, -1, 1), new Vector3(0, -1, -1), // South Down, North Down
+			new Vector3(1, 0, 1), new Vector3(-1, 0, -1), // Diagonal movements
+			new Vector3(1, 0, -1), new Vector3(-1, 0, 1),
 		];
 
 		foreach($directions as $direction){
