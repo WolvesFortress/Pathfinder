@@ -132,7 +132,17 @@ class DStarLite{
 				continue; // Skip this neighbor if the path is not walkable
 			}
 
-			// If both checks pass, add the neighbor to the list
+			// For diagonal movements, ensure both adjacent axes are walkable
+			if($direction->getX() !== 0 && $direction->getZ() !== 0){
+				$adjacent1 = $node->addVector(new Vector3($direction->getX(), 0, 0));
+				$adjacent2 = $node->addVector(new Vector3(0, 0, $direction->getZ()));
+
+				if(!$this->isNicePositionToStand($adjacent1, $standCost) || !$this->isNicePositionToStand($adjacent2, $standCost)){
+					continue; // Skip this diagonal neighbor if adjacent axes are blocked
+				}
+			}
+
+			// If all checks pass, add the neighbor to the list
 			$neighbors[] = $neighborNode;
 		}
 
