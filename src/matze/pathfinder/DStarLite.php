@@ -13,9 +13,12 @@ use SplMinHeap;
 
 class DStarLite{
 	private array $graph = [];
+	/** @var float[] */
 	private array $rhs = [];
+	/** @var float[] */
 	private array $g = [];
 	private SplMinHeap $queue;
+	/** @var float[] */
 	private array $km = [0.0];
 
 	public function __construct(
@@ -29,7 +32,7 @@ class DStarLite{
 
 	private function calculateKey(Node $node, Node $start) : array{
 		$minG = min($this->g[$node->getHash()] ?? PHP_INT_MAX, $this->rhs[$node->getHash()] ?? PHP_INT_MAX);
-		return [$minG + $this->h($start, $node) + $this->km[0], $minG];
+		return [$minG + $this->h($start, $node) + $this->km[0.0], $minG];
 	}
 
 	private function h(Node $a, Node $b) : float{
