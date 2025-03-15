@@ -8,10 +8,11 @@ use pocketmine\math\Vector3;
 use pocketmine\world\World;
 
 class Node extends Vector3 {
-    private float $g = PHP_INT_MAX;
-    private float $h = PHP_INT_MAX;
+	private ?Node $parentNode = null;
+	private float $g = PHP_INT_MAX; // cost from start to this node (for A*)
+	private float $h = 0; // heuristic cost from this node to goal (for A*)
 
-    private ?Node $parentNode = null;
+//    private ?Node $parentNode = null;
 
     private int $hash;
 
@@ -55,4 +56,13 @@ class Node extends Vector3 {
     public static function fromVector3(Vector3 $vector3): Node {
         return new Node($vector3->getFloorX() + 0.5, $vector3->getFloorY(), $vector3->getFloorZ() + 0.5);
     }
+
+
+	/**
+	 * Create a Node from a hash
+	 */
+	public static function fromHash(int $hash) : self{
+		World::getBlockXYZ($hash, $x, $y, $z);
+		return self::fromVector3(new Vector3($x, $y, $z));
+	}
 }

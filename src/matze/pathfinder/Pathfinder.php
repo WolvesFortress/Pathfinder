@@ -19,9 +19,9 @@ use pocketmine\permission\Permission;
 use pocketmine\permission\PermissionManager;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
+use pocketmine\utils\Utils as PMUtils;
 use pocketmine\world\format\io\FastChunkSerializer;
 use pocketmine\world\World;
-use pocketmine\utils\Utils as PMUtils;
 
 class Pathfinder {
     private static bool $debug = false;
@@ -86,7 +86,8 @@ class Pathfinder {
     }
 
     public function findPath(Vector3 $from, Vector3 $to, World $world, float $timeout = 0.2): ?PathResult {
-        $pathfinder = new BasePathfinder(new SyncFictionalWorld($world->getFolderName()), $this->settings, $timeout, $this->rules);
+//        $pathfinder = new BasePathfinder(new SyncFictionalWorld($world->getFolderName()), $this->settings, $timeout, $this->rules);
+		$pathfinder = new DStarLitePathfinder(new SyncFictionalWorld($world->getFolderName()), $this->settings, $timeout, $this->rules);
         return $pathfinder->findPath($from, $to);
     }
 

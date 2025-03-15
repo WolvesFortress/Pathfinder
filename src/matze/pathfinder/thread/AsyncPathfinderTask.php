@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace matze\pathfinder\thread;
 
 use Closure;
-use matze\pathfinder\BasePathfinder;
+use matze\pathfinder\DStarLite;
 use matze\pathfinder\world\AsyncFictionalWorld;
 use pmmp\thread\ThreadSafeArray;
 use pocketmine\math\Vector3;
@@ -42,7 +42,8 @@ class AsyncPathfinderTask extends AsyncTask {
             $world->setChunk($chunkX, $chunkZ, FastChunkSerializer::deserializeTerrain($chunk));
         }
 
-        $pathfinder = new BasePathfinder($world, igbinary_unserialize($this->settings), $this->timeout, $rules);
+//        $pathfinder = new BasePathfinder($world, igbinary_unserialize($this->settings), $this->timeout, $rules);
+		$pathfinder = new DStarLite($world, igbinary_unserialize($this->settings), $this->timeout, $rules);
         World::getBlockXYZ($this->start, $startX, $startY, $startZ);
         World::getBlockXYZ($this->target, $targetX, $targetY, $targetZ);
         $this->setResult($pathfinder->findPath(new Vector3($startX, $startY, $startZ), new Vector3($targetX, $targetY, $targetZ)));

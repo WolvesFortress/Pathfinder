@@ -12,7 +12,7 @@ use matze\pathfinder\world\FictionalWorld;
 use pocketmine\math\Vector3;
 
 class BasePathfinder {
-    private const SIDES = [
+	protected const SIDES = [
         [0, 1],
         [1, 0],
         [0, -1],
@@ -26,10 +26,10 @@ class BasePathfinder {
      * @param Rule[] $rules
      */
     public function __construct(
-        private FictionalWorld $world,
-        private Settings $settings,
+		protected FictionalWorld $world,
+		protected Settings $settings,
         private float $timeout,
-        private array $rules,
+		protected array $rules,
     ){}
 
     public function isNicePositionToWalk(Vector3 $current, Vector3 $target, int &$cost): bool {
