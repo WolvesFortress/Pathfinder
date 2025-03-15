@@ -113,8 +113,7 @@ class BasePathfinder {
                 }
                 if(!isset($this->openList[$node->getHash()]) || ($currentNode->getG() + $cost) < $node->getG()) {
                     $node->setG(($currentNode->getG() + $cost));
-//					$node->setH($this->calculateSimpleHeuristic($node, $targetVector));
-					$node->setH($this->calculateDirectionalHeuristic($node, $targetVector, $totalDistance, $directionVector));
+					$node->setH($this->calculateSimpleHeuristic($node, $currentNode));
 					$node->setParentNode($currentNode);
                     $this->openList[$node->getHash()] = $node;
                     if($bestNode === null || $bestNode->getH() > $node->getH()) {
@@ -179,38 +178,19 @@ class BasePathfinder {
         return array_key_first($openList);
     }
 
-	protected function calculateSimpleHeuristic(Node $node, Vector3 $targetVector) : float{
-		// Manhattan distance is often better for grid-based movement
-		$dx = abs($node->x - $targetVector->x);
-		$dy = abs($node->y - $targetVector->y);
-		$dz = abs($node->z - $targetVector->z);
+	protected function calculateSimpleHeuristic(Node $a, Vector3 $b) : float{
+		$dx = abs($a->getX() - $b->getX());
+		// If your entities can move vertically (e.g., climb blocks, jump, or fly), include dy in the heuristic to account for vertical movement costs.
+		$dy = abs($a->getY() - $b->getY());
+		$dz = abs($a->getZ() - $b->getZ());
 
-		// Combine Manhattan distance with a small Euclidean component
-		// This will encourage more direct paths without risking pathfinding errors
-		$manhattan = $dx + $dy + $dz;
-//		$euclidean = sqrt($dx * $dx + $dy * $dy + $dz * $dz);
+		// Octile distance for X and Z axes
+		$minD = min($dx, $dz);
+		$maxD = max($dx, $dz);
+		$octileDistance = ($minD * sqrt(2)) + ($maxD - $minD);
 
-		return $manhattan/* * 0.8 + $euclidean * 0.2*/ ;
-	}
-
-	protected function calculateDirectionalHeuristic(Node $node, Vector3 $targetVector, float $maxDistance, Vector3 $directionVector) : float{
-		// Basic distance to target
-		$distanceToTarget = $this->calculateSimpleHeuristic($node, $targetVector);
-
-		// Calculate how aligned this node is with the desired direction
-		$nodeToTarget = $targetVector->subtractVector($node);
-		// Calculate the distance to the end point to have less penalty the closer you are, otherwise it might give high penalty for nodes close to the goal since the angle is different
-		$nodeDistanceToTarget = $nodeToTarget->length();
-		$nodeToTargetNorm = $nodeToTarget->normalize();
-
-		// Dot product measures alignment (1 = perfect alignment, 0 = perpendicular, -1 = opposite)
-		$alignment = $nodeToTargetNorm->dot($directionVector);
-
-		// Reward nodes that are well-aligned with the target direction
-		// This basically says "prefer nodes that are along the direct path"
-		$alignmentWeight = abs(($maxDistance - $nodeDistanceToTarget) ** 2); // Adjust as needed
-
-		return $distanceToTarget ** 2 * 0.8 - ($alignment * $alignmentWeight);
+		// Add vertical distance (Y-axis) as a separate cost
+		return $octileDistance + $dy;
 	}
 
     protected function isClearBetweenPoints(Vector3 $vec1, Vector3 $vec2): bool {
