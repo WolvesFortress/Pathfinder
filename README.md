@@ -1,6 +1,8 @@
 # A WIP [PocketMine](https://github.com/pmmp/PocketMine-MP) Pathfinder
 
 # VIRION IS CURRENTLY IN ALPHA PHASE!
+# THIS D*Lite BRANCH IS EXPERIMENTAL AND NEEDS API CHANGES TO TAKE ADVANTAGE OF updateVertex!
+[D\* Lite paper](http://idm-lab.org/bib/abstracts/papers/aaai02b.pdf) by Sven Koenig and Maxim Likhachev.
 
 ## TO-DO:
 - More default rules (Help is appreciated!)
